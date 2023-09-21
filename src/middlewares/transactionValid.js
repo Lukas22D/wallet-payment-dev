@@ -30,14 +30,14 @@ const validateTransaction = async (req, res, next) => {
             Yup.number()
                 .min(1)
                 .when("paymentType", (paymentType, schema) =>
-                    paymentType === "credit_card" ? schema.max(12) : schema.max(1)),
+                    paymentType == "credit_card" ? schema.max(12) : schema.max(1)),
         customerName: Yup.string().required().min(3),
         customerEmail: Yup.string().required().email(),
-        customerMobile:
+       customerMobile:
             Yup.string()
                 .required()
                 .test("is-valid-mobile", "${path} is Invalid mobile number",
-                    (value) => { parsePhoneNumber(value, "BR").isValid() }),
+                    (value) =>  parsePhoneNumber(value, "BR").isValid() ), 
         customerDocument:
             Yup.string()
                 .required()

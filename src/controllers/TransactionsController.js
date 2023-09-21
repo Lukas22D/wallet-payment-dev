@@ -1,5 +1,5 @@
 import Cart from '../models/cart';
-
+import TransactionServices from '../services/TransactionServices';
 
 class TransactionsController {
 
@@ -32,6 +32,39 @@ class TransactionsController {
             }
 
             // Criar a transação(registro)
+
+            const service = new TransactionServices();
+            const response = await service.process(
+                {
+                    cartCode,
+                    paymentType,
+                    installments,
+                    customer:{
+                        name: customerName,
+                        email: customerEmail,
+                        mobile: customerMobile,
+                        document: customerDocument,
+                    },
+                    billing:{
+                        address: billingAddress,
+                        number: billingNumber,
+                        neighborhood: billingNeighborhood,
+                        city: billingCity,
+                        state: billingState,
+                        zipcode: billingZipCode,
+                    },
+                    creditCard: {
+                        number: creditCardNumber,
+                        expiration: creditCardExperiration,
+                        holderName: creditCardHolderName,
+                        cvv: creditCardCvv,
+                    }
+                }
+            );
+            // integrar com o gateway de pagamento
+            // atualizar o status da transação
+
+            return res.status(201).json(response);
 
         } catch (err) {
             return res.status(400).json({ error: err.message });
