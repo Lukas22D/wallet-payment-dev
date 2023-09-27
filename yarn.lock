@@ -703,6 +703,11 @@ once@^1.3.0:
   dependencies:
     wrappy "1"
 
+pagarme@^4.33.1:
+  version "4.33.1"
+  resolved "https://registry.yarnpkg.com/pagarme/-/pagarme-4.33.1.tgz#e483e4cf04370671fe21e9ba529de96519e2f804"
+  integrity sha512-Mom9WkYTBT7KqRy3PDXTcHVR8btA1afUZCGUVB2YmaqDq5ssVbC4FnAOlk4+kUZ00RBhBCZRx9F9WqQ9W13u+A==
+
 parseurl@~1.3.3:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/parseurl/-/parseurl-1.3.3.tgz#9da19e7bee8d12dff0513ed5b76957793bc2e8d4"

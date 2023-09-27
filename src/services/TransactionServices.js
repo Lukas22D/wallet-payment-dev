@@ -1,7 +1,15 @@
 import Cart from '../models/cart';
 import Transaction from '../models/Transaction';
+import PagarMeProvider from '../providers/PagarMeProvider';
 
 export default class TransactionService {
+
+    paymentProvider;
+    constructor(paymentProvider) {
+        this.paymentProvider = paymentProvider || new PagarMeProvider();
+    }
+
+
     async process({
         cartCode,
         paymentType,
@@ -16,7 +24,7 @@ export default class TransactionService {
         }
         const transaction = await Transaction.create({
             cartCode: cart.code,
-            code: "123456",
+            code: "1111",
             total: cart.price,
             paymentType,
             installments,
@@ -31,6 +39,16 @@ export default class TransactionService {
             billingCity: billing.city,
             billingState: billing.state,
             billingZipcode: billing.zipcode,
+        });
+
+        this.paymentProvider.process({
+            transactionCode: transaction.code,
+            total: transaction.total,
+            paymentType,
+            installments,
+            customer,
+            billing,
+            creditCard,
         });
         return transaction;
     }
