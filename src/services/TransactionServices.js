@@ -41,7 +41,7 @@ export default class TransactionService {
             billingZipcode: billing.zipcode,
         });
 
-        this.paymentProvider.process({
+        const response = await this.paymentProvider.process({
             transactionCode: transaction.code,
             total: transaction.total,
             paymentType,
@@ -50,6 +50,29 @@ export default class TransactionService {
             billing,
             creditCard,
         });
-        return transaction;
+
+
+        await transaction.updateOne({
+            transactionId: response.transactionId,
+            status: response.status,
+            processorResponse: response.processorResponse,
+        });
+
+        return response; 
+    }
+
+    async updateStatus({code, providerStatus}){
+        const transaction = transaction.findOne({code});
+        if(!transaction){
+            throw `transaction ${code} not found`
+        }
+
+        const status = this.paymentProvider.translateStatus(providerStatus);
+
+        if(!status){
+            throw `status ${providerStatus} not found`
+        }
+
+        await transaction.updateOne({status});
     }
 }

@@ -1,4 +1,5 @@
 import { cpf  } from "cpf-cnpj-validator";
+import pagarme from 'pagarme';
 
 class PagarMeProvider {
     async process ({
@@ -24,6 +25,7 @@ class PagarMeProvider {
             payment_method: 'credit_card',
             amount: total * 100,
             installments,
+            card_holder_name: creditCard.holderName,
             card_number: creditCard.number.replace(/[^?0-9]/g, ''),
             card_expiration_date: creditCard.expiration.replace(/[^?0-9]/g, ''),
             card_cvv: creditCard.cvv,
@@ -105,7 +107,7 @@ class PagarMeProvider {
         const transactionParams = {
 
             async: false,
-            //postback_urL:
+            postback_urL: process.env.PAGARME_WEBHOOK_URL,
             ...paymentParams,
             ...customerParams,
             ...billingParams,
@@ -114,9 +116,42 @@ class PagarMeProvider {
 
         };
 
-        console.debug(transactionParams);
+        const client = await pagarme.client.connect({
+            api_key: process.env.PAGARME_API_KEY
+        });
+
+        const response = await client.transactions.create(transactionParams);
+
+        return {
+            transactionId: response.id,
+            status: this.translateStatus(response.status),
+            billet: {
+                url: response.boleto_url,
+                barcode: response.boleto_barcode,
+            },
+            card: {
+                id: response.card?.id,
+            },
+            processorResponse: JSON.stringify(response),
+        };
 
     }
+
+    translateStatus(status) {
+        const statusMap = {
+        processing: 'processing',
+        waiting_payment: 'pending',
+        authorizad: 'pending',
+        paid: 'approved',
+        refused: 'refused',
+        pending_refund: 'refunded',
+        refunded: 'refuseded',
+        chargedback: 'chargeback',
+        };
+
+        return statusMap[status];
+    }
+
 }
 
 
